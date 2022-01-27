@@ -136,7 +136,7 @@ pause('Brick Breaker!!', pygame.K_SPACE)
 while True:
     # Background
     screen.fill((0, 0, 51))
-    # clock.tick(250)
+    clock.tick(250)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
