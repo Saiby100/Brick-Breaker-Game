@@ -90,7 +90,7 @@ ball = pygame.image.load(os.path.join(path, 'resources/main_ball.png'))
 icon = pygame.image.load(os.path.join(path, 'resources/main_ball.png'))
 
 #SETTING UP DISPLAY
-width, height = 1520, 1000
+width, height = 720, 400
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('Brick Breaker')
 pygame.display.set_icon(icon)
