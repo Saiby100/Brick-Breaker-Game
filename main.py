@@ -214,7 +214,7 @@ while True:
             bar_rect.centerx = width/2
 
     #If all blocks are broken
-    if bricks.__len__() == 0:
+    if len(bricks) == 0:
         if pause('Press Enter To Play Again', pygame.K_RETURN):
             move = False
             set_brick_amount(36)
