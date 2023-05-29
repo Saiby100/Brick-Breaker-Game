@@ -2,6 +2,7 @@ import pygame
 import sys
 import time
 import os
+from utils.ship import Ship
 from pygame.time import Clock
 
 '''
@@ -41,6 +42,7 @@ while running:
     #Load background
     i = 0 if i >= len(bg_arr) - 1 else i + 1
     bg = pygame.image.load(bg_path+"/"+bg_arr[i])
+    # bg = pygame.transform.scale(bg, (width, height))
     bg = pygame.transform.scale(bg, (height, width))
     bg = pygame.transform.rotate(bg, 270)
     screen.blit(bg, (0, 0))
