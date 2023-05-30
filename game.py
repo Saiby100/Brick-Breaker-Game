@@ -27,12 +27,15 @@ clock = Clock()
 bg_arr = get_bg_array("galaxy")
 i = len(bg_arr)
 
-ship_path = "resources/Idle.png"
-ship = pygame.image.load(ship_path)
-ship = pygame.transform.scale(ship, (130, 130))
-ship = pygame.transform.rotate(ship, 90)
-ship_px = width / 2 - 65
+ship_px = width / 2 - 45
 ship_py = height*3 / 4
+
+main_group = pygame.sprite.Group()
+my_ship = Ship(ship_px, ship_py)
+my_ship.resize(90, 90)
+my_ship.rotate(90)
+my_ship.next_img()
+main_group.add(my_ship)
 
 running = True
 
@@ -51,8 +54,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
     
-    #
-    screen.blit(ship, (ship_px, ship_py))
+    #Draw sprites
+    main_group.draw(screen)
+    # screen.blit(ship, (ship_px, ship_py))
     
     pygame.display.flip()
     
