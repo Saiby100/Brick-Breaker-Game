@@ -34,7 +34,6 @@ main_group = pygame.sprite.Group()
 my_ship = Ship(ship_px, ship_py)
 my_ship.resize(90, 90)
 my_ship.rotate(90)
-my_ship.next_img()
 main_group.add(my_ship)
 
 running = True
@@ -56,7 +55,7 @@ while running:
     
     #Draw sprites
     main_group.draw(screen)
-    # screen.blit(ship, (ship_px, ship_py))
+    main_group.update()
     
     pygame.display.flip()
     

@@ -3,15 +3,15 @@ import pygame
 class Ship(pygame.sprite.Sprite):
     def __init__(self, *args):
         super().__init__()
-        self.x, self.y = 0, 0
-        self.set_moving()
 
-        ship_type = "corvette"
-        self.width = self.height = 192
         pos_x = pos_y = 0
+        self.x, self.y = 0, 0
+        self.ship_type = "corvette"
+        self.width = self.height = 192
+
 
         if len(args) == 5:
-            ship_type = args[0]
+            self.ship_type = args[0]
             self.width = args[1]
             self.height = args[2]
             pos_x = args[3]
@@ -21,36 +21,57 @@ class Ship(pygame.sprite.Sprite):
             pos_x = args[0]
             pos_y = args[1]
 
-        self.ship_img = self.__get_img__(ship_type)
+        self.set_moving()
         
         self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         self.image.set_alpha(255)
         self.image.blit(self.ship_img, (self.x, self.y, self.width, self.height))
 
-        self.rect = self.ship_img.get_rect()
+        self.rect = self.image.get_rect()
         self.rect.topleft = [pos_x, pos_y]
 
-    def __get_img__(self, ship_type):
-        return pygame.image.load(f"resources/ships/{ship_type}/{self.action}")
+    '''
+        Updates the image of the ship.
+    '''
+    def __update_img__(self):
+        self.ship_img = pygame.image.load(f"resources/ships/{self.ship_type}/{self.action}")
     
     def set_idle(self):
         self.action = "Idle.png"
+        self.__update_img__()
     
     def set_moving(self):
         self.action = "Move.png"
+        self.__update_img__()
     
     def set_shooting(self):
         self.action = "Attack_1.png"
+        self.__update_img__()
     
     def set_destroyed(self):
         self.action = "Destroyed.png"
+        self.__update_img__()
     
+    '''
+        Jumps to the next image in the animation.
+    '''
     def next_img(self):
-        if (self.x + self.width >= self.ship_img.get_width()):
+        step = 192
+        if (self.width >= self.ship_img.get_width()): #End of image animation
             self.x = 0
+            self.width = step
+
+            self.ship_img = pygame.transform.scale(self.ship_img, (90, 90))
+            self.ship_img = pygame.transform.rotate(self.ship_img, 90)
+
+            self.image.blit(self.ship_img, (self.x, self.y, self.width, self.height))
             return
 
-        self.x += self.width
+        self.x += step
+        self.width += step
+        self.ship_img = pygame.transform.scale(self.ship_img, (90, 90))
+        self.ship_img = pygame.transform.rotate(self.ship_img, 90)
+        self.image.blit(self.ship_img, (self.x, self.y, self.width, self.height))
     
     '''
         Scales the image to the desired size.
@@ -65,7 +86,10 @@ class Ship(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.image, degrees)
     
     def update(self):
-        pass
+        self.next_img()
+    
+    def update_pos(self, pos_x, pos_y):
+        self.rect.topleft = [pos_x, pos_y]
 
             
 if __name__ == '__main__':
