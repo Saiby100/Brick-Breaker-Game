@@ -1,9 +1,8 @@
 import pygame
 import sys
-import time
 import os
-from utils.ship import Ship
 from pygame.time import Clock
+from utils.ship import Ship
 
 '''
     Returns an array for the background frames
@@ -18,33 +17,32 @@ def get_bg_array(bg_type):
     return bg_arr
 
 
+#SETTING UP
 pygame.init()
 
-width, height = 800, 500
+width, height = 1000, 600
 screen = pygame.display.set_mode((width, height))
 clock = Clock()
 
+#BACKGROUND VARS
 bg_arr = get_bg_array("galaxy")
 i = len(bg_arr)
 
 ship_px = width / 2 - 45
-ship_py = height*3 / 4
+ship_py = height*3 / 4 - 45
 
-main_group = pygame.sprite.Group()
-my_ship = Ship(ship_px, ship_py)
-my_ship.resize(90, 90)
-my_ship.rotate(90)
-main_group.add(my_ship)
+ship_group = pygame.sprite.Group()
+my_ship = Ship("corvette", 120, ship_px, ship_py)
+ship_group.add(my_ship)
 
 running = True
 
 while running:
-    clock.tick(25) #30 FPS
+    clock.tick(30) #30 FPS
 
     #Load background
     i = 0 if i >= len(bg_arr) - 1 else i + 1
     bg = pygame.image.load(bg_path+"/"+bg_arr[i])
-    # bg = pygame.transform.scale(bg, (width, height))
     bg = pygame.transform.scale(bg, (height, width))
     bg = pygame.transform.rotate(bg, 270)
     screen.blit(bg, (0, 0))
@@ -52,10 +50,24 @@ while running:
     #Detect keypresses
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                my_ship.shoot()
+
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_LEFT]:
+        my_ship.move_left()
+    if keys[pygame.K_RIGHT]:
+        my_ship.move_right()
+    if keys[pygame.K_UP]:
+        my_ship.move_up()
+    if keys[pygame.K_DOWN]:
+        my_ship.move_down()
     
     #Draw sprites
-    main_group.draw(screen)
-    main_group.update()
+    ship_group.draw(screen)
+    ship_group.update()
     
     pygame.display.flip()
     

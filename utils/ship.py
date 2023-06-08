@@ -1,95 +1,99 @@
 import pygame
 
 class Ship(pygame.sprite.Sprite):
-    def __init__(self, *args):
+    def __init__(self, ship_type, size, pos_x, pos_y):
         super().__init__()
 
-        pos_x = pos_y = 0
         self.x, self.y = 0, 0
-        self.ship_type = "corvette"
-        self.width = self.height = 192
-
-
-        if len(args) == 5:
-            self.ship_type = args[0]
-            self.width = args[1]
-            self.height = args[2]
-            pos_x = args[3]
-            pos_y = args[4]
-        
-        elif len(args) == 2:
-            pos_x = args[0]
-            pos_y = args[1]
+        self.ship_type = ship_type
+        self.SIZE = size
+        self.max_frames = 0
+        self.frame = 0
+        self.anim_speed = 0.25
+        self.shot = False
+        self.mov_dist = 15
 
         self.set_moving()
         
-        self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        self.image.set_alpha(255)
-        self.image.blit(self.ship_img, (self.x, self.y, self.width, self.height))
+        self.image = pygame.Surface((size, size), pygame.SRCALPHA)
+        self.next_frame()
 
         self.rect = self.image.get_rect()
         self.rect.topleft = [pos_x, pos_y]
 
     '''
-        Updates the image of the ship.
-    '''
+        Updates the image of the ship and scales it to appropriate size.  '''
     def __update_img__(self):
         self.ship_img = pygame.image.load(f"resources/ships/{self.ship_type}/{self.action}")
-    
-    def set_idle(self):
-        self.action = "Idle.png"
-        self.__update_img__()
+
+        frames = self.ship_img.get_width() / 192
+        img_width = frames * self.SIZE
+
+        self.max_frames = frames
+
+        self.ship_img = pygame.transform.scale(self.ship_img, (img_width, self.SIZE))
+        self.ship_img = pygame.transform.rotate(self.ship_img, 90)
     
     def set_moving(self):
         self.action = "Move.png"
         self.__update_img__()
+        self.frame = 0
     
     def set_shooting(self):
         self.action = "Attack_1.png"
         self.__update_img__()
+        self.frame = 0
     
     def set_destroyed(self):
         self.action = "Destroyed.png"
         self.__update_img__()
+        self.frame = 0
     
     '''
         Jumps to the next image in the animation.
     '''
-    def next_img(self):
-        step = 192
-        if (self.width >= self.ship_img.get_width()): #End of image animation
-            self.x = 0
-            self.width = step
+    def next_frame(self):
+        start_y = self.SIZE * int(self.frame)
+        end_y = self.SIZE * (int(self.frame) + 1)
 
-            self.ship_img = pygame.transform.scale(self.ship_img, (90, 90))
-            self.ship_img = pygame.transform.rotate(self.ship_img, 90)
+        start_x = 0
+        end_x = self.SIZE
 
-            self.image.blit(self.ship_img, (self.x, self.y, self.width, self.height))
-            return
-
-        self.x += step
-        self.width += step
-        self.ship_img = pygame.transform.scale(self.ship_img, (90, 90))
-        self.ship_img = pygame.transform.rotate(self.ship_img, 90)
-        self.image.blit(self.ship_img, (self.x, self.y, self.width, self.height))
-    
-    '''
-        Scales the image to the desired size.
-    '''
-    def resize(self, width, height):
-        self.image = pygame.transform.scale(self.image, (width, height))
-    
-    '''
-        Rotate the image by the specified angle.
-    '''
-    def rotate(self, degrees):
-        self.image = pygame.transform.rotate(self.image, degrees)
+        self.image.blit(self.ship_img, (0, 0), (start_x, start_y, end_x, end_y))
     
     def update(self):
-        self.next_img()
+        if (self.frame >= self.max_frames - 1):
+            self.frame = 0
+            self.clear_surface()
+
+            if (self.shot):
+                self.shot = False
+                self.set_moving()
+
+        else:
+            self.frame += self.anim_speed
+
+        self.next_frame()
     
-    def update_pos(self, pos_x, pos_y):
-        self.rect.topleft = [pos_x, pos_y]
+    def clear_surface(self):
+        clear = pygame.Color(0, 0, 0, 0)
+        self.image.fill(clear)
+        
+    def shoot(self):
+        self.shot = True
+        self.set_shooting()
+    
+    def move_left(self):
+        self.rect = self.rect.move(-self.mov_dist, 0)
+
+    def move_right(self):
+        self.rect = self.rect.move(self.mov_dist, 0)
+    
+    def move_up(self):
+        self.rect = self.rect.move(0, -self.mov_dist)
+
+    def move_down(self):
+        self.rect = self.rect.move(0, self.mov_dist)
 
             
 if __name__ == '__main__':
