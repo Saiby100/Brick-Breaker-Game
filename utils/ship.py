@@ -5,7 +5,7 @@ class Ship(pygame.sprite.Sprite):
         super().__init__()
 
         self.x, self.y = 0, 0
-        self.ship_type = ship_type
+        self.SHIP_TYPE = ship_type
         self.SIZE = size
         self.max_frames = 0
         self.frame = 0
@@ -21,10 +21,13 @@ class Ship(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = [pos_x, pos_y]
 
+    def get_type(self):
+        return self.SHIP_TYPE
+
     '''
         Updates the image of the ship and scales it to appropriate size.  '''
     def __update_img__(self):
-        self.ship_img = pygame.image.load(f"resources/ships/{self.ship_type}/{self.action}")
+        self.ship_img = pygame.image.load(f"resources/ships/{self.SHIP_TYPE}/{self.action}")
 
         frames = self.ship_img.get_width() / 192
         img_width = frames * self.SIZE
@@ -94,6 +97,9 @@ class Ship(pygame.sprite.Sprite):
 
     def move_down(self):
         self.rect = self.rect.move(0, self.mov_dist)
+    
+    def get_top(self):
+        return (self.rect.centerx, self.rect.top)
 
             
 if __name__ == '__main__':

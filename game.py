@@ -3,6 +3,7 @@ import sys
 import os
 from pygame.time import Clock
 from utils.ship import Ship
+from utils.bullet import Bullet
 
 '''
     Returns an array for the background frames
@@ -32,6 +33,8 @@ ship_px = width / 2 - 45
 ship_py = height*3 / 4 - 45
 
 ship_group = pygame.sprite.Group()
+bullet_group = pygame.sprite.Group()
+
 my_ship = Ship("corvette", 120, ship_px, ship_py)
 ship_group.add(my_ship)
 
@@ -53,6 +56,9 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 my_ship.shoot()
+                bullet = Bullet(my_ship.get_type(), 1, my_ship.get_top())
+                bullet_group.add(bullet)
+
 
     keys = pygame.key.get_pressed()
 
@@ -67,7 +73,9 @@ while running:
     
     #Draw sprites
     ship_group.draw(screen)
+    bullet_group.draw(screen)
     ship_group.update()
+    bullet_group.update()
     
     pygame.display.flip()
     
