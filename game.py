@@ -4,6 +4,7 @@ import os
 from pygame.time import Clock
 from utils.ship import Ship
 from utils.bullet import Bullet
+from utils.enemy import EnemyShip
 
 '''
     Returns an array for the background frames
@@ -16,6 +17,14 @@ def get_bg_array(bg_type):
     bg_arr.sort()
 
     return bg_arr
+
+'''
+    Listens for when shooting animation of the specified ship completes.
+'''
+def shot_anim_complete_listener(ship, bullet_group, bullet):
+    while(ship.shot):
+        pass
+    bullet_group.add(bullet)
 
 
 #SETTING UP
@@ -33,10 +42,14 @@ ship_px = width / 2 - 45
 ship_py = height*3 / 4 - 45
 
 ship_group = pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 
-my_ship = Ship("corvette", 120, ship_px, ship_py)
+my_ship = Ship("fighter", 120, ship_px, ship_py)
 ship_group.add(my_ship)
+
+enemy = EnemyShip("Ship2", 120, ship_px, ship_py-100)
+enemy_group.add(enemy)
 
 running = True
 
@@ -56,7 +69,7 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 my_ship.shoot()
-                bullet = Bullet(my_ship.get_type(), 1, my_ship.get_top())
+                bullet = Bullet("Shot1", 75, my_ship.get_top())
                 bullet_group.add(bullet)
 
 
@@ -74,8 +87,11 @@ while running:
     #Draw sprites
     ship_group.draw(screen)
     bullet_group.draw(screen)
+    enemy_group.draw(screen)
+
     ship_group.update()
     bullet_group.update()
+    enemy_group.update()
     
     pygame.display.flip()
     
@@ -84,3 +100,4 @@ while running:
 
     
     
+
