@@ -13,6 +13,7 @@ class Ship(pygame.sprite.Sprite):
         self.mov_dist = 15
 
         self.set_moving()
+        self.get_bullet_params()
         
         self.image = pygame.Surface((size, size), pygame.SRCALPHA)
         self.next_frame()
@@ -105,7 +106,34 @@ class Ship(pygame.sprite.Sprite):
     
     def shot(self):
         return self.shot
+    
+    def get_size(self):
+        return self.SIZE
+    
+    def get_bullet_params(self):
+        if self.SHIP_TYPE == "corvette":
+            self.bullet_type = "Double_Charge"
+            self.bullet_size = 45
+            self.bullet_animate = False
 
+        elif self.SHIP_TYPE == "bomber":
+            self.bullet_type = "Double_Charge_Red"
+            self.bullet_size = 35
+            self.bullet_animate = False
+
+        else:
+            self.bullet_type = "Shot1"
+            self.bullet_size = 80
+            self.bullet_animate = True
+    
+    def get_bullet_type(self):
+        return self.bullet_type
+    
+    def get_bullet_size(self):
+        return self.bullet_size
+    
+    def animate_bullet(self):
+        return self.bullet_animate
             
 if __name__ == '__main__':
     pass

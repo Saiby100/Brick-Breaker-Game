@@ -2,10 +2,10 @@ import pygame
 import os
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, shot_type, size, pos):
+    def __init__(self, shot_type, size, pos, animate):
         super().__init__()
 
-        self.anim_complete = False
+        self.animate = animate
         self.anim_speed = 0.25
         self.size = size
         self.mov_dist = 15
@@ -31,14 +31,20 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.center = pos
     
     def update(self):
-        if (self.rect.bottom < 0 or self.frame >= self.max_frames - 1):
+        if (self.rect.bottom < 0):
             self.kill()
             return
         
-        else:
-            self.frame += self.anim_speed
+        if (self.animate):
+            #Only if the bullet type allows for animation
+            if (self.animate and self.frame >= self.max_frames - 1):
+                self.kill()
+            
+            else:
+                self.frame += self.anim_speed
 
-        self.next_frame()
+            self.next_frame()
+
         self.rect = self.rect.move(0, -self.mov_dist)
 
     def clear_surface(self):
@@ -48,5 +54,5 @@ class Bullet(pygame.sprite.Sprite):
     def next_frame(self):
         self.clear_surface()
         self.image.blit(self.frames[int(self.frame)], (0, 0))
-
+    
 

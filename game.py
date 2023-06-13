@@ -36,11 +36,11 @@ ship_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 
-my_ship = Ship("fighter", 120, ship_px, ship_py)
+my_ship = Ship("corvette", 150, ship_px, ship_py)
 ship_group.add(my_ship)
 
-enemy = EnemyShip("Ship2", 120, ship_px, ship_py-100)
-enemy_group.add(enemy)
+# enemy = EnemyShip("Ship2", 120, ship_px, ship_py-100)
+# enemy_group.add(enemy)
 
 running = True
 
@@ -60,7 +60,10 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 my_ship.shoot()
-                bullet = Bullet("Shot1", 75, my_ship.get_top())
+                bullet = Bullet(my_ship.get_bullet_type(), 
+                                my_ship.get_bullet_size(), 
+                                my_ship.get_top(), 
+                                my_ship.animate_bullet())
                 bullet_group.add(bullet)
 
 
