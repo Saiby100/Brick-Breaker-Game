@@ -2,9 +2,9 @@ import pygame
 import sys
 import os
 from pygame.time import Clock
-from utils.ship import Ship
-from utils.bullet import Bullet
-from utils.enemy import EnemyShip
+from utils.ship import *
+from utils.enemy import *
+from utils.bullet import *
 
 '''
     Returns an array for the background frames
@@ -17,15 +17,6 @@ def get_bg_array(bg_type):
     bg_arr.sort()
 
     return bg_arr
-
-'''
-    Listens for when shooting animation of the specified ship completes.
-'''
-def shot_anim_complete_listener(ship, bullet_group, bullet):
-    while(ship.shot):
-        pass
-    bullet_group.add(bullet)
-
 
 #SETTING UP
 pygame.init()

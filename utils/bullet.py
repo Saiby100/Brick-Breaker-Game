@@ -6,9 +6,9 @@ class Bullet(pygame.sprite.Sprite):
         super().__init__()
 
         self.anim_complete = False
-        self.anim_speed = 0.2
+        self.anim_speed = 0.25
         self.size = size
-        self.mov_dist = 8
+        self.mov_dist = 15
 
         path = f"resources/Shots/{shot_type}/"
         frame_images = os.listdir(path)

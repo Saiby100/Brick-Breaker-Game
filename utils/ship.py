@@ -72,6 +72,7 @@ class Ship(pygame.sprite.Sprite):
             if (self.shot):
                 self.shot = False
                 self.set_moving()
+                self.anim_speed = 0.25
 
         else:
             self.frame += self.anim_speed
@@ -84,6 +85,7 @@ class Ship(pygame.sprite.Sprite):
         
     def shoot(self):
         self.shot = True
+        self.anim_speed = 1 #Increase animation speed
         self.set_shooting()
     
     def move_left(self):
