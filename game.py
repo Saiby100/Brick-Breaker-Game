@@ -29,18 +29,17 @@ clock = Clock()
 bg_arr = get_bg_array("galaxy")
 i = len(bg_arr)
 
-ship_px = width / 2 - 45
-ship_py = height*3 / 4 - 45
+score = 0
+lives = 3
 
-ship_group = pygame.sprite.Group()
-enemy_group = pygame.sprite.Group()
-bullet_group = pygame.sprite.Group()
+my_ship = Ship("bomber", width/2, height/4 * 3)
+enemy = EnemyShip("Ship2", 120, width/2, 120)
 
-my_ship = Ship("corvette", 150, ship_px, ship_py)
-ship_group.add(my_ship)
+ally_ships = pygame.sprite.Group(my_ship)
+enemy_ships = pygame.sprite.Group(enemy)
 
-# enemy = EnemyShip("Ship2", 120, ship_px, ship_py-100)
-# enemy_group.add(enemy)
+ally_bullets = pygame.sprite.Group()
+enemy_bullets = pygame.sprite.Group()
 
 running = True
 
@@ -64,7 +63,7 @@ while running:
                                 my_ship.get_bullet_size(), 
                                 my_ship.get_top(), 
                                 my_ship.animate_bullet())
-                bullet_group.add(bullet)
+                ally_bullets.add(bullet)
 
 
     keys = pygame.key.get_pressed()
@@ -79,19 +78,20 @@ while running:
         my_ship.move_down()
     
     #Draw sprites
-    ship_group.draw(screen)
-    bullet_group.draw(screen)
-    enemy_group.draw(screen)
+    ally_ships.draw(screen)
+    ally_bullets.draw(screen)
 
-    ship_group.update()
-    bullet_group.update()
-    enemy_group.update()
+    enemy_ships.draw(screen)
+    enemy_bullets.draw(screen)
+
+    ally_ships.update()
+    ally_bullets.update()
+
+    enemy_ships.update()
+    enemy_bullets.update()
+
+    #Detect collisions
+    pygame.sprite.groupcollide(enemy_ships, ally_bullets, True, True)
     
     pygame.display.flip()
     
-
-    
-
-    
-    
-

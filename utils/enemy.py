@@ -21,7 +21,7 @@ class EnemyShip(pygame.sprite.Sprite):
         self.next_frame()
 
         self.rect = self.image.get_rect()
-        self.rect.topleft = [pos_x, pos_y]
+        self.rect.center = [pos_x, pos_y]
 
     def get_type(self):
         return self.SHIP_TYPE

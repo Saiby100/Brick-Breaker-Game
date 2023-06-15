@@ -1,25 +1,19 @@
 import pygame
+import json
 
 class Ship(pygame.sprite.Sprite):
-    def __init__(self, ship_type, size, pos_x, pos_y):
+    def __init__(self, ship_type, pos_x, pos_y):
         super().__init__()
 
-        self.SHIP_TYPE = ship_type
-        self.SIZE = size
-        self.max_frames = 0
-        self.frame = 0
-        self.anim_speed = 0.25
-        self.shot = False
-        self.mov_dist = 15
+        self.set_params(ship_type)
 
         self.set_moving()
-        self.get_bullet_params()
         
-        self.image = pygame.Surface((size, size), pygame.SRCALPHA)
+        self.image = pygame.Surface((self.SIZE, self.SIZE), pygame.SRCALPHA)
         self.next_frame()
 
         self.rect = self.image.get_rect()
-        self.rect.topleft = [pos_x, pos_y]
+        self.rect.center = [pos_x, pos_y]
 
     def get_type(self):
         return self.SHIP_TYPE
@@ -110,22 +104,6 @@ class Ship(pygame.sprite.Sprite):
     def get_size(self):
         return self.SIZE
     
-    def get_bullet_params(self):
-        if self.SHIP_TYPE == "corvette":
-            self.bullet_type = "Double_Charge"
-            self.bullet_size = 45
-            self.bullet_animate = False
-
-        elif self.SHIP_TYPE == "bomber":
-            self.bullet_type = "Double_Charge_Red"
-            self.bullet_size = 35
-            self.bullet_animate = False
-
-        else:
-            self.bullet_type = "Shot1"
-            self.bullet_size = 80
-            self.bullet_animate = True
-    
     def get_bullet_type(self):
         return self.bullet_type
     
@@ -134,9 +112,33 @@ class Ship(pygame.sprite.Sprite):
     
     def animate_bullet(self):
         return self.bullet_animate
+    
+    def set_params(self, ship_type):
+        try:
+            with open(f"resources/ships/{ship_type}/params.json") as file:
+                params = json.load(file)
+
+            self.max_frames = 0
+            self.frame = 0
+            self.anim_speed = 0.25
+            self.shot = False
+            self.mov_dist = 15
+            
+            self.SHIP_TYPE = ship_type
+            self.SIZE = params["size"]
+            self.bullet_type = params["bullet_type"]
+            self.bullet_size = params["bullet_size"]
+            self.bullet_animate = params["bullet_animate"]
+
+        except (FileNotFoundError):
+            print(f"No parameters found for ship {ship_type}")
+            exit(-1)
+            
             
 if __name__ == '__main__':
     pass
+
+
 
 
 
