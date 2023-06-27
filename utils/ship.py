@@ -9,7 +9,7 @@ class _Thrusters(pygame.sprite.Sprite):
     def __init__(self, colour,  size, pos, anim_speed):
         super().__init__()
 
-        frames_path = f"/home/saiby/Documents/projects/Brick-Breaker-Game/resources/ships/{colour}/thrusters/"
+        frames_path = f"resources/ships/{colour}/thrusters/"
 
         self.anim_speed = anim_speed
         self.frame = 0
