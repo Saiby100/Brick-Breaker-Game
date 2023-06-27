@@ -1,145 +1,198 @@
 import pygame
 import json
+import os
 
-class Ship(pygame.sprite.Sprite):
-    def __init__(self, ship_type, pos_x, pos_y):
+class _Thrusters(pygame.sprite.Sprite):
+    '''
+        Represents the thrusters component for the Ship sprite
+    '''
+    def __init__(self, colour,  size, pos, anim_speed):
         super().__init__()
 
-        self.set_params(ship_type)
+        frames_path = f"/home/saiby/Documents/projects/Brick-Breaker-Game/resources/ships/{colour}/thrusters/"
 
-        self.set_moving()
+        self.anim_speed = anim_speed
+        self.frame = 0
+        self.frames = []
+        self.width, self.height = size
+
+        frame_images = os.listdir(frames_path)
+        frame_images.sort()
         
-        self.image = pygame.Surface((self.SIZE, self.SIZE), pygame.SRCALPHA)
-        self.next_frame()
+        for frame_img in frame_images:
+            image = pygame.image.load(frames_path + frame_img)
+            image = pygame.transform.scale(image, (self.width, self.height))
+
+            self.frames.append(image)
+        
+        self.max_frames = len(self.frames)
+        self.frame = 0
+
+        self.image = self.frames[self.frame]
 
         self.rect = self.image.get_rect()
-        self.rect.center = [pos_x, pos_y]
-
-    def get_type(self):
-        return self.SHIP_TYPE
-
-    '''
-        Updates the image of the ship and scales it to appropriate size.  '''
-    def __update_img__(self):
-        self.ship_img = pygame.image.load(f"resources/ships/{self.SHIP_TYPE}/{self.action}")
-        step = 192
-
-        frames = self.ship_img.get_width() / step
-        img_width = frames * self.SIZE
-
-        self.max_frames = frames
-
-        self.ship_img = pygame.transform.scale(self.ship_img, (img_width, self.SIZE))
-        self.ship_img = pygame.transform.rotate(self.ship_img, 90)
+        self.rect.centerx = pos[0]
+        self.rect.top = pos[1]
     
-    def set_moving(self):
-        self.action = "Move.png"
-        self.__update_img__()
-        self.frame = 0
-    
-    def set_shooting(self):
-        self.action = "Attack_1.png"
-        self.__update_img__()
-        self.frame = 0
-    
-    def set_destroyed(self):
-        self.action = "Destroyed.png"
-        self.__update_img__()
-        self.frame = 0
-    
-    '''
-        Jumps to the next image in the animation.
-    '''
-    def next_frame(self):
-        start_y = self.SIZE * int(self.frame)
-        end_y = self.SIZE * (int(self.frame) + 1)
-
-        start_x = 0
-        end_x = self.SIZE
-
-        self.image.blit(self.ship_img, (0, 0), (start_x, start_y, end_x, end_y))
+    def update_frame(self):
+        self.image = self.frames[int(self.frame)]
     
     def update(self):
-        if (self.frame >= self.max_frames - 1):
+        if self.frame >= self.max_frames - 1: 
             self.frame = 0
-            self.clear_surface()
-
-            if (self.shot):
-                self.shot = False
-                self.set_moving()
-                self.anim_speed = 0.25
-
+        
         else:
             self.frame += self.anim_speed
 
-        self.next_frame()
+        self.update_frame()
     
-    def clear_surface(self):
-        clear = pygame.Color(0, 0, 0, 0)
-        self.image.fill(clear)
+    def update_pos(self, pos):
+        self.rect.centerx = pos[0]
+        self.rect.top = pos[1]
+
+class Ship(pygame.sprite.Sprite):
+    '''
+        Represents a ship sprite.
+    '''
+    def __init__(self, colour, pos):
+        super().__init__()
+
+        self.colour = colour
+        self.mov_dist = 15
+        self.width, self.height = 80, 85
+        self.animate = False
+
+        self.init_bullet_params(colour)
         
-    def shoot(self):
-        self.shot = True
-        self.anim_speed = 1 #Increase animation speed
-        self.set_shooting()
+        self.ship_body = pygame.image.load(f"resources/ships/ship.png")
+        self.ship_body = pygame.transform.scale(self.ship_body, (self.width, self.height))
+
+        self.image = self.ship_body
+
+        self.rect = self.image.get_rect()
+        self.rect.center = pos
+
+        self.init_thrusters()
     
+    '''Gets the required frames for the state of the ship'''
+    def update_frames(self, state):
+        path = f"resources/ships/{self.colour}/{state}/"
+        frame_images = os.listdir(path)
+        frame_images.sort()
+
+        self.frames = []
+
+        for frame in frame_images:
+            img = pygame.image.load(path+frame)
+            img = pygame.transform.scale(img, (self.width, self.height))
+
+            self.frames.append(img)
+        
+        self.max_frames = len(self.frames)
+        self.frame = 0
+    
+    '''Initialises thrusters for this ship colour'''
+    def init_thrusters(self):
+        thrust_size = (self.width / 2 - 5, 25)
+        thrust_anim_speed = 0.15
+        thrust_pos = self.get_thrust_pos()
+
+        self.thrusters = _Thrusters(self.colour, 
+                                    thrust_size,
+                                    thrust_pos,
+                                    thrust_anim_speed)
+
+    def get_thrusters(self):
+        return self.thrusters 
+    
+    '''Returns the ship colour'''
+    def get_colour(self):
+        return self.colour
+
+    '''Sets the ship body to default'''
+    def set_idle(self):
+        self.frame = 0
+        self.image = self.ship_body
+        self.animate = False
+
+    '''Start shoot animation'''
+    def shoot(self): 
+        self.update_frames("shoot")
+        self.frame = 0
+        self.anim_speed = 1 #Increase animation speed
+        self.animate = True
+        self.shot = True
+    
+    '''Start explode animation'''
+    def explode(self):
+        #TODO
+        pass
+    
+    '''Updates ship frame'''
+    def update_frame(self):
+        self.image = self.frames[int(self.frame)]
+
+    def update(self):
+        if self.animate:
+            if (self.frame >= self.max_frames - 1):
+                self.frame = 0
+
+                if (self.shot):
+                    self.shot = False
+                    self.set_idle()
+                    return
+
+            else:
+                self.frame += self.anim_speed
+
+            self.update_frame()
+
+    '''Gets the position for the thrusters relative to the ship position'''
+    def get_thrust_pos(self):
+        return (self.rect.centerx, self.rect.bottom - 5)
+    
+    '''Ship moves left by a factor of mov_dist'''
     def move_left(self):
         self.rect = self.rect.move(-self.mov_dist, 0)
+        self.thrusters.update_pos(self.get_thrust_pos())
 
+    '''Ship moves right by a factor of mov_dist'''
     def move_right(self):
         self.rect = self.rect.move(self.mov_dist, 0)
+        self.thrusters.update_pos(self.get_thrust_pos())
     
+    '''Ship moves up by a factor of mov_dist'''
     def move_up(self):
         self.rect = self.rect.move(0, -self.mov_dist)
+        self.thrusters.update_pos(self.get_thrust_pos())
 
+    '''Ship moves down by a factor of mov_dist'''
     def move_down(self):
         self.rect = self.rect.move(0, self.mov_dist)
+        self.thrusters.update_pos(self.get_thrust_pos())
     
+    '''Gets the cordinates for the top of this ship'''
     def get_top(self):
         return (self.rect.centerx, self.rect.top)
     
-    def shot(self):
-        return self.shot
-    
-    def get_size(self):
-        return self.SIZE
-    
+    '''Returns the bullet type for this ship'''
     def get_bullet_type(self):
         return self.bullet_type
     
+    '''Returns the bullet size of this ship'''
     def get_bullet_size(self):
         return self.bullet_size
     
-    def animate_bullet(self):
-        return self.bullet_animate
-    
-    def set_params(self, ship_type):
+    '''Initialises bullet parameters for ship colour'''
+    def init_bullet_params(self, ship_type):
         try:
             with open(f"resources/ships/{ship_type}/params.json") as file:
                 params = json.load(file)
-
-            self.max_frames = 0
-            self.frame = 0
-            self.anim_speed = 0.25
-            self.shot = False
-            self.mov_dist = 15
             
-            self.SHIP_TYPE = ship_type
-            self.SIZE = params["size"]
             self.bullet_type = params["bullet_type"]
             self.bullet_size = params["bullet_size"]
-            self.bullet_animate = params["bullet_animate"]
 
         except (FileNotFoundError):
             print(f"No parameters found for ship {ship_type}")
             exit(-1)
             
-            
-if __name__ == '__main__':
-    pass
-
-
-
-
-
-

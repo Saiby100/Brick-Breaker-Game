@@ -5,6 +5,7 @@ from pygame.time import Clock
 from utils.ship import *
 from utils.enemy import *
 from utils.bullet import *
+import random
 
 '''
     Returns an array for the background frames
@@ -32,23 +33,28 @@ i = len(bg_arr)
 score = 0
 lives = 3
 
-my_ship = Ship("bomber", width/2, height/4 * 3)
+colours = ["blue", "green", "orange", "purple", "red", "yellow"]
+
+colour = colours[random.randint(0, len(colours))]
+my_ship = Ship(colour, (width/2, height/4 * 3))
 enemy = EnemyShip("Ship2", 120, width/2, 120)
 
-ally_ships = pygame.sprite.Group(my_ship)
+array = [my_ship.get_thrusters(), my_ship]
+ally_ships = pygame.sprite.Group(array)
 enemy_ships = pygame.sprite.Group(enemy)
 
 ally_bullets = pygame.sprite.Group()
 enemy_bullets = pygame.sprite.Group()
 
 running = True
+bg_anim_speed = 0.5
 
 while running:
-    clock.tick(30) #30 FPS
+    clock.tick(40) #30 FPS
 
     #Load background
-    i = 0 if i >= len(bg_arr) - 1 else i + 1
-    bg = pygame.image.load(bg_path+"/"+bg_arr[i])
+    i = 0 if i >= len(bg_arr) - 1 else i + bg_anim_speed
+    bg = pygame.image.load(bg_path+"/"+bg_arr[int(i)])
     bg = pygame.transform.scale(bg, (height, width))
     bg = pygame.transform.rotate(bg, 270)
     screen.blit(bg, (0, 0))
@@ -61,10 +67,8 @@ while running:
                 my_ship.shoot()
                 bullet = Bullet(my_ship.get_bullet_type(), 
                                 my_ship.get_bullet_size(), 
-                                my_ship.get_top(), 
-                                my_ship.animate_bullet())
+                                my_ship.get_top())
                 ally_bullets.add(bullet)
-
 
     keys = pygame.key.get_pressed()
 
